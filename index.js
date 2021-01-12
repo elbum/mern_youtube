@@ -2,18 +2,25 @@ const express = require('express')
 const app = express()
 const port = 3000
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const mongoose = require("mongoose");
-const config = require('./config/key')
+const config = require('./config/key');
 
 console.log(config.mongoURI)
+
 // application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // application/json 
-app.use(bodyParser.json())
+app.use(bodyParser.json());
+
+// cookie parser
+app.use(cookieParser());
 
 
-const { User } = require("./models/User")
+const { auth } = require("./middleware/auth");
+const { User } = require("./models/User");
+
 mongoose.connect(config.mongoURI, {
     useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false
 }).then(() => console.log("MongoDB Connected"))
@@ -25,9 +32,12 @@ app.get('/', (req, res) => {
     res.send('Hello World! HIHI')
 });
 
-app.post('/register', (req, res) => {
+app.post('/api/users/register', (req, res) => {
     // 회원가입 정보를 client 에서 받아서  db 저장
     const user = new User(req.body)
+
+    // 비번 암호화
+    // pre('save') 에서 구현함.
 
     // db 저장
     user.save((err, userInfo) => {
@@ -39,6 +49,70 @@ app.post('/register', (req, res) => {
 
 
 });
+
+app.post('/api/users/login', (req, res) => {
+    // 요청된 이메일을 db 에서 찾고
+    User.findOne({ email: req.body.email }, (err, user) => {
+        if (!user) {
+            return res.json({
+                loginSuccess: false,
+                message: "No user email"
+            })
+        }
+
+        // 있으면.
+        //이메일을 이메일이 데이터 베이스에 있으면.  맞는 비번인지 확인
+        user.comparePassword(req.body.password, (err, isMatch) => {
+            if (!isMatch)
+                return res.json({ loginSuccess: false, message: "wrong password" });
+
+            // 비번이 맞으면 토큰 생성.
+            user.generateToken((err, user) => {
+                if (err) return res.status(400).send(err);
+
+                // 토큰을 저장. 어디다?  쿠키 or localstorage ?
+                // 쿠키 쓰자..
+
+                res.cookie("x_auth", user.token)
+                    .status(200)
+                    .json({ loginSuccess: true, userId: user._id })
+            })
+        })
+    });
+})
+
+// auth middleware
+app.get('/api/users/auth', auth, (req, res) => {
+
+    // 여기까지 미들웨어를 통과해왔으면. Authentication 이 True 라는 뜻임.
+
+    // role 0 : 일반 ,  아니면 관리자.
+    res.status(200).json({
+        _id: req.user._id,
+        isAdmin: req.user.role === 0 ? false : true,
+        isAuth: true,
+        email: req.user.email,
+        name: req.user.name,
+        lastname: req.user.lastname,
+        role: req.user.role,
+        image: req.user.image
+    })
+})
+
+
+app.get('/api/users/logout', auth, (req, res) => {
+    // 로그아웃하려는애를 찾아서. 
+    User.findOneAndUpdate({ _id: req.user._id },
+        { token: "" },
+        (err, user) => {
+            if (err) return res.json({ success: false, err });
+            return res.status(200).send({
+                success: true
+            })
+        });
+
+
+})
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
