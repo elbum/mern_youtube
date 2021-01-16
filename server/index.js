@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 5000
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const mongoose = require("mongoose");
@@ -31,6 +31,10 @@ mongoose.connect(config.mongoURI, {
 app.get('/', (req, res) => {
     res.send('Hello World! HIHI')
 });
+
+app.get('/api/hello', (req, res) => {
+    res.send("Hellloooo React")
+})
 
 app.post('/api/users/register', (req, res) => {
     // 회원가입 정보를 client 에서 받아서  db 저장
@@ -103,7 +107,7 @@ app.get('/api/users/auth', auth, (req, res) => {
 app.get('/api/users/logout', auth, (req, res) => {
     // 로그아웃하려는애를 찾아서. 
     User.findOneAndUpdate({ _id: req.user._id },
-        { token: "" },
+        { token: "" }, // 토큰을 그냥 빼버림.
         (err, user) => {
             if (err) return res.json({ success: false, err });
             return res.status(200).send({
