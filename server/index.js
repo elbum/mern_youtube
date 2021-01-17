@@ -76,7 +76,7 @@ app.post('/api/users/login', (req, res) => {
 
                 // 토큰을 저장. 어디다?  쿠키 or localstorage ?
                 // 쿠키 쓰자..
-
+                res.cookie("x_authExp", user.tokenExp);
                 res.cookie("x_auth", user.token)
                     .status(200)
                     .json({ loginSuccess: true, userId: user._id })
@@ -107,9 +107,10 @@ app.get('/api/users/auth', auth, (req, res) => {
 app.get('/api/users/logout', auth, (req, res) => {
     // 로그아웃하려는애를 찾아서. 
     User.findOneAndUpdate({ _id: req.user._id },
-        { token: "" }, // 토큰을 그냥 빼버림.
+        { token: "", tokenExp: "" }, // 토큰을 그냥 빼버림.
         (err, user) => {
             if (err) return res.json({ success: false, err });
+            console.log("logout ok")
             return res.status(200).send({
                 success: true
             })

@@ -1,5 +1,4 @@
-import axios from 'axios'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { loginUser } from '../../../_actions/user_action';
 import { withRouter } from 'react-router-dom';
@@ -9,7 +8,7 @@ function LoginPage(props) {
 
     const dispatch = useDispatch()
 
-    const [Email, setEmail] = useState("test@naver.com")
+    const [Email, setEmail] = useState("test3@naver.com")
     const [Password, setPassword] = useState("12345678")
 
     const onEmailHandler = (event) => {
@@ -32,6 +31,7 @@ function LoginPage(props) {
         dispatch(loginUser(body))
             .then(response => {
                 if (response.payload.loginSuccess) {
+                    console.log("login ok")
                     props.history.push('/')
                 } else {
                     alert('Login Error')
