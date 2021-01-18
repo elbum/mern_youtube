@@ -5,8 +5,12 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const mongoose = require("mongoose");
 const config = require('./config/key');
+const cors = require('cors');
+// const multer = require('multer');
 
 console.log(config.mongoURI)
+
+app.use(cors());
 
 // application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -118,6 +122,14 @@ app.get('/api/users/logout', auth, (req, res) => {
 
 
 })
+
+// static 파일을 엑세스 하려면 명시해야함. (썸네일 로드)
+app.use('/uploads', express.static('uploads'));
+
+// video 쪽은 라우터로 구현하자. 라우터로 엔드포인트를 정리.
+app.use('/api/video',require('./routes/video.js'));
+
+
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
