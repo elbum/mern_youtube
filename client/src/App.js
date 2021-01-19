@@ -15,6 +15,7 @@ import RegisterPage from './components/views/RegisterPage/RegisterPage'
 import NavBar from "./components/views/NavBar/NavBar"
 import Footer from "./components/views/Footer/Footer"
 import VideoUploadPage from './components/views/VideoUploadPage/VideoUploadPage'
+import VideoDetailPage from './components/views/VideoDetailPage/VideoDetailPage'
 import Auth from './hoc/auth'
 
 function App() {
@@ -30,6 +31,9 @@ function App() {
           {/* <Route exact path="/">
             <LandingPage />
           </Route> */}
+          {/* // null 누구나
+          // false 비회원
+          // true 회원 */}
 
           {/* 깔끔하게는 이렇게 */}
           <Route exact path="/" component={Auth(LandingPage, null)} />
@@ -39,6 +43,9 @@ function App() {
           <Route path="/register" component={Auth(RegisterPage, false)} />
 
           <Route path="/video/upload" component={Auth(VideoUploadPage, true)} />
+
+          <Route path="/video/:videoId" component={Auth(VideoDetailPage, null)} />
+
 
 
         </Switch>

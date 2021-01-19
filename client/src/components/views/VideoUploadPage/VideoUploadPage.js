@@ -6,6 +6,11 @@ import Dropzone from 'react-dropzone';
 import { Typography, Button, Form, message, Input } from 'antd';
 import {PlusCircleOutlined} from '@ant-design/icons';
 import axios from 'axios';
+
+
+// id 를 가저오기 위해 훅을 쓰자
+import {useSelector} from 'react-redux';
+
 // import TextArea from 'antd/lib/input/TextArea';
 
 const { TextArea } = Input;
@@ -22,9 +27,10 @@ const CategoryOptions = [
     {value:2 , label:"Music"},
     {value:3 , label:"Pets & Animals"}
 ]
-function VideoUploadPage() {
+function VideoUploadPage(props) {
     // state 에다가 value 를 저장한다.
     // 서버에 보낼떈 state 에있는 값을 보내버림.
+    const user = useSelector(state=>state.user); // hook
 
     const [VideoTitle, setVideoTitle] = useState("")
     const [Description, setDescription] = useState("")
@@ -90,6 +96,33 @@ function VideoUploadPage() {
             }
         })
     }
+    const onSubmit=(e)=>{
+        e.preventDefault();  // 초기화 안되게
+        const variables = {
+            writer: user.userData._id ,    // redux 데이터 로드
+            title: VideoTitle,
+            description: Description,
+            privacy: Private,
+            filePath: FilePath,
+            category: Category,
+            duration: Duration,
+            thumbnail: ThumbnailPath,
+
+        }
+        axios.post('/api/video/uploadVideo',variables)
+        .then(response => {
+            if(response.data.success){
+                console.log(response.data)
+                message.success('Upload Succeed!')
+                setTimeout(function(){
+                    props.history.push('/')
+                },3000)
+
+            } else {
+                alert('Video Upload to DB Fail')
+            }
+        })
+    }
 
 
     return (
@@ -107,7 +140,7 @@ function VideoUploadPage() {
 
 
 
-            <Form onSubmit>
+            <Form onSubmit={onSubmit}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     {/* drop zone */}
                     <Dropzone 
@@ -169,7 +202,7 @@ function VideoUploadPage() {
                     {/* <option key value></option> */}
                 </select><br /><br />
 
-                <Button type="primary" size="large" onClick>
+                <Button type="primary" size="large" onClick={onSubmit}>
                     Submit
 
                 </Button>
