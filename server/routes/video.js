@@ -5,7 +5,7 @@ const { auth } = require("../middleware/auth");
 const multer = require('multer');
 var ffmpeg = require('fluent-ffmpeg');
 const { Video } = require('../models/Video');
-
+const { Subscriber } = require('../models/Subscriber');
 // Multer Boilerplate Config
 let storage = multer.diskStorage({
     destination:(req,file,cb) => {
@@ -108,6 +108,36 @@ router.get('/getVideos',(req,res) => {
     
 });
 
+// 구독화면의 구독비디오들
+router.post('/getSubscriptionVideos',(req,res) => {
+    console.log('getSubscriptionVideo router called');
+    
+    // 자신의 아이디로 구독하는 사람들 (userTo) 을 찾고
+    Subscriber.find({userFrom:req.body.userFrom})
+        .exec((err,subscriberInfo)=>{
+            if(err) return res.status(400).send(err)
+
+            var subscribedUser = [];
+
+            subscriberInfo.map((subscriber,i)=>{
+                subscribedUser.push(subscriber.userTo);
+            })
+      
+
+            // 찾은 사람들의 비디오들을 가져온다.
+            console.log("SUBSCRIBED USERS"+subscribedUser)
+            // subscribedUser 가 여러개일수있기 때문에.. 키 하나로 찾을수없음 {in} 사용
+            Video.find({writer:{$in:subscribedUser}})
+            .populate('writer')     // writer 만 가져오는게 아니라 전체정보.
+            .exec((err,videos) => {
+                if(err) return res.status(400).send(err);
+                return res.status(200).json({success:true,videos})
+
+            })
+
+        })
+    
+});
 
 // 비디오 클릭했을때 상세정보
 router.post('/getVideoDetail',(req,res) => {

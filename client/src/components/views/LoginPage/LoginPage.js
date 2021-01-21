@@ -32,6 +32,9 @@ function LoginPage(props) {
             .then(response => {
                 if (response.payload.loginSuccess) {
                     console.log("login ok")
+                    
+                    // 나중에 subscribe 정보확인할때 쓰려고 저장함.
+                    localStorage.setItem("userId", response.payload.userId)
                     props.history.push('/')
                 } else {
                     alert('Login Error')

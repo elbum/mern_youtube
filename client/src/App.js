@@ -16,6 +16,7 @@ import NavBar from "./components/views/NavBar/NavBar"
 import Footer from "./components/views/Footer/Footer"
 import VideoUploadPage from './components/views/VideoUploadPage/VideoUploadPage'
 import VideoDetailPage from './components/views/VideoDetailPage/VideoDetailPage'
+import SubscriptionPage from './components/views/SubscriptionPage/SubscriptionPage'
 import Auth from './hoc/auth'
 
 function App() {
@@ -45,6 +46,8 @@ function App() {
           <Route path="/video/upload" component={Auth(VideoUploadPage, true)} />
 
           <Route path="/video/:videoId" component={Auth(VideoDetailPage, null)} />
+
+          <Route path="/subscription" component={Auth(SubscriptionPage, null)} />
 
 
 

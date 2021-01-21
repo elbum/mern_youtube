@@ -7,10 +7,11 @@ import { Card,Icons,Avatar, Col,Typography,Row} from 'antd';
 import {PlusCircleOutlined} from '@ant-design/icons';
 import moment from "moment";
 
+
 const {Title} = Typography;
 const {Meta} = Card;
 
-function LandingPage(props) {
+function SubscriptionPage() {
 
     const [Video, setVideo] = useState([])
     
@@ -18,20 +19,25 @@ function LandingPage(props) {
     // 클래스였으면 componentdidMount 써야함.
     // 이건 훅이니까 useEffect
     useEffect(() => {
+        // 구독하고있는 비디오만 가져와야 하니까 param 필요함.
+        const subscriptionvariables = {
+            userFrom : localStorage.getItem("userId"),
+        }
+        console.log("Localstrage UserId =",subscriptionvariables)
         axios.get('/api/hello')
             .then(function(response) { if(response.status === 200){
                 console.log("Backend OK")
             } else {
                 console.log("Backend Down.")
             }})
-            .then(axios.get('/api/video/getVideos')
+            .then(axios.post('/api/video/getSubscriptionVideos',subscriptionvariables)
             .then(response => {
                 if(response.data.success){
                     console.log(response.data)
                     setVideo(response.data.videos)
 
                 } else {
-                    alert("Video Load Error")
+                    alert("Subscription Video Load Error")
                 }
             }))
               
@@ -79,7 +85,7 @@ function LandingPage(props) {
     return (
         <div style={{ width: '85%', margin : '3rem auto' }}>
             <br/><br/><br/><br/><br/><br/>
-            <Title level={2}> Recommended </Title>
+            <Title level={2}> SubScription List </Title>
             <Title level={5}> Level3Recommended </Title>
             <hr/>
             <Row gutter={[32,16]}>
@@ -96,4 +102,4 @@ function LandingPage(props) {
     )
 }
 
-export default withRouter(LandingPage)
+export default SubscriptionPage
