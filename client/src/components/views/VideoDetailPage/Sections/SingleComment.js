@@ -1,5 +1,6 @@
 import React,{useEffect,useState} from 'react'
 import {Row , Col , Card , List, Typographym , Comment,Avatar,Button,Input} from 'antd'
+import LikeDislikes  from './LikeDislikes'
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
 import {useSelector} from 'react-redux';
@@ -44,6 +45,7 @@ function SingleComment(props) {
     console.log("heres Singlecomment.js = " + props.comment.content)
 
     const actions = [
+        <LikeDislikes userId={localStorage.getItem('userId')} commentId={ props.comment._id } />,
         <span onClick={onClickReplyOpen} key="comment-basic-reply-to"> Reply to </span>
     ]
     return (

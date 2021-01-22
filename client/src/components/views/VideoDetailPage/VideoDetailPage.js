@@ -5,6 +5,7 @@ import axios from 'axios';
 import SideVideo from './Sections/SideVideo'
 import Subscribe from './Sections/Subscribe'
 import Comment from './Sections/Comment'
+import LikeDislikes from './Sections/LikeDislikes'
 const {Title} = Typography;
 const {Meta} = Card;
 
@@ -74,7 +75,7 @@ function VideoDetailPage(props) {
                     <video style={{width:'100%'}} src={`http://localhost:5000/${VideoDetail.filePath}`} controls/>
                     {/* prop으로 등록자의 정보를 넘겨서, subscribe 정보를 조회함. */}
                     <List.Item
-                    actions={[subscribeButton]}
+                    actions={[<LikeDislikes video userId={localStorage.getItem('userId')} videoId={videoId} />,subscribeButton]}
                     >  {VideoDetail.title}
                         <List.Item.Meta
                         avatar

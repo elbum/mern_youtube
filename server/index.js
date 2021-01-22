@@ -126,12 +126,14 @@ app.get('/api/users/logout', auth, (req, res) => {
 // static 파일을 엑세스 하려면 명시해야함. (썸네일 로드)
 app.use('/uploads', express.static('uploads'));
 
-// video , subscribe 쪽은 라우터로 구현하자. 라우터로 엔드포인트를 정리.
+// video , subscribe 여기 아래부터는 라우터로 구현하자. 라우터로 엔드포인트를 정리.
 app.use('/api/video',require('./routes/video.js'));
 
 app.use('/api/subscribe',require('./routes/subscribe.js'));
 
 app.use('/api/comment',require('./routes/comment.js'));
+
+app.use('/api/like',require('./routes/like.js'))
 
 
 app.listen(port, () => {
